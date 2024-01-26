@@ -161,11 +161,118 @@ const isSubsequence = (toFind, target) => {
 };
 
 
+// console.log(isSubsequence('hello', 'hello world')); // true
+// console.log(isSubsequence('sing', 'sting')); // true
+// console.log(isSubsequence('abc', 'abracadabra')); // true
+// // 
+// console.log(isSubsequence('abc', 'acb')); // false (order matters)
+// console.log(isSubsequence('abcdea', 'abceda')); // false (order matters)
 
 
-console.log(isSubsequence('hello', 'hello world')); // true
-console.log(isSubsequence('sing', 'sting')); // true
-console.log(isSubsequence('abc', 'abracadabra')); // true
-// 
-console.log(isSubsequence('abc', 'acb')); // false (order matters)
-console.log(isSubsequence('abcdea', 'abceda')); // false (order matters)
+// we get an array of numbers in the input, along with another number
+// this second number specifies the number of consecutive digits we have to sum
+// then while summing each possible combination, we have to compare it to the max value and find the new max
+// example - [100,200,300,400,500] , 2 -> 400+500 will be the max
+// example - [100,3,4,5,600] , 3 -> try 100+3+4 -> then -100 +5 -> then -3 +600
+
+const maxSubArraySum = (arr, num) => {
+    if (num > arr.length) {
+        return "Incorrect array length or number of digits to sum!";
+    }
+    let maxSum = -Infinity;
+    let tempSum = 0;
+    // for each element in arr, upto num, add elements
+    for (let i = 0; i < num; i++) {
+        tempSum += arr[i];
+    }
+    // make that the max so far
+    // then, for each element in array from num upto end of array, create new sums
+    for (let i = num; i < arr.length; i++) {
+        tempSum = tempSum - arr[i - num] + arr[i];
+        if (tempSum > maxSum) {
+            maxSum = tempSum;
+        }
+    }
+    return maxSum;
+    // create new sums by subtracting previous element and adding next element
+    // check each time if the new sum is greater than max and store that - to later print
+};
+
+// console.log(maxSubArraySum([100, 200, 300, 400], 2));
+// console.log(maxSubArraySum([1, 4, 2, 10, 23, 3, 1, 0, 20], 4));
+// console.log(maxSubArraySum([-3, 4, 0, -2, 6, -1], 2));
+// console.log(maxSubArraySum([3, -2, 7, -4, 1, -1, 4, -2, 1], 2));
+
+const minSubArrayLen = (arr, num) => {
+    // one core boundary check
+    for (const element of arr) {
+        if (element < 0) {
+            return 0;
+        }
+    }
+
+    let digitsBeingAdded = 1;
+    // need to perform check for length of array first
+    // we already have the first element of the array stored in our summation variable
+    // because it is not greater than or equal to the passed integer, we are at this stage now
+    // here, we start with trying to add just two elements at a time
+    // and keep checking after every addition if the summed value is greater than or equal to the passed integer
+    // if it is not, we keep continuing through to the end of the array
+    // if end of array is reached, and we still haven't reached a value greater than or equal to the passed integer, we up the number of elements being summed each time
+    // this will need to have an end condition though
+    // which could be digitsBeingAdded < arr.length
+
+    while (digitsBeingAdded < arr.length) {
+        let sumOfElements = 0;
+        let resultArr = [];
+        for (let i = 0; i < digitsBeingAdded; i++) {
+            sumOfElements = sumOfElements + arr[i];
+            resultArr.push(arr[i]);
+        }
+        for (let i = digitsBeingAdded; i < arr.length; i++) {
+            sumOfElements = sumOfElements - arr[i - digitsBeingAdded] + arr[i];
+            // console.log(sumOfElements);
+            if (sumOfElements >= num) {
+                resultArr.shift();
+                resultArr.push(arr[digitsBeingAdded]);
+                return resultArr.length;
+            }
+        }
+        digitsBeingAdded++;
+    }
+    return 0;
+};
+
+// console.log(minSubArrayLen([2, 3, 1, 2, 4, 3], 7)) // 2 -> because [4,3] is the smallest subarray
+// console.log(minSubArrayLen([2, 1, 6, 5, 4], 9)) // 2 -> because [5,4] is the smallest subarray
+// console.log(minSubArrayLen([3, 1, 7, 11, 2, 9, 8, 21, 62, 33, 19], 52)) // 1 -> because [62] is greater than 52
+// console.log(minSubArrayLen([1, 4, 16, 22, 5, 7, 8, 9, 10], 39)) // 3
+// console.log(minSubArrayLen([1, 4, 16, 22, 5, 7, 8, 9, 10], 55)) // 5
+// console.log(minSubArrayLen([4, 3, 3, 8, 1, 2, 3], 11)) // 2
+// console.log(minSubArrayLen([1, 4, 16, 22, 5, 7, 8, 9, 10], 95)) // 0
+
+const findLongestSubstring = (str) => {
+    let sum = "";
+    let maxSum = "";
+    let i = 0;
+    while (i < str.length) {
+        if (sum.includes(str[i]) === false) {
+            sum += str[i];
+            i++;
+            if (sum.length > maxSum.length) {
+                maxSum = sum;
+            }
+        }
+        else {
+            i = i - sum.length + 1;
+            sum = "";
+        }
+    }
+    return [maxSum, maxSum.length];
+}
+console.log(findLongestSubstring("rithmschool"));
+console.log(findLongestSubstring("thisisawesome"));
+console.log(findLongestSubstring("thecatinthehat"));
+console.log(findLongestSubstring("bbbbbb"));
+console.log(findLongestSubstring("longestsubstring"));
+console.log(findLongestSubstring("thisishowwedoit"));
